@@ -28,6 +28,17 @@ func TestAccClient(t *testing.T) {
 					resource.TestCheckResourceAttr("auth0_client.my_client", "client_metadata.foo", "zoo"),
 				),
 			},
+			{
+				Config: testAccClientSimpleConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "name", "Simple Application - Acceptance Test"),
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "custom_login_page_on", "false"),
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "is_first_party", "false"),
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "callbacks.#", "0"),
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "allowed_origins.#", "0"),
+					resource.TestCheckResourceAttr("auth0_client.my_simple_client", "web_origins.#", "0"),
+				),
+			},
 		},
 	})
 }
@@ -89,5 +100,21 @@ resource "auth0_client" "my_client" {
       app_bundle_identifier = "com.my.bundle.id"
     }
   }
+}
+`
+
+const testAccClientSimpleConfig = `
+provider "auth0" {}
+
+resource "auth0_client" "my_simple_client" {
+  name = "Simple Application - Acceptance Test"
+  description = "Test Applications Long Description"
+  app_type = "non_interactive"
+  custom_login_page_on = false
+  is_first_party = false
+  oidc_conformant = true
+  callbacks = []
+  allowed_origins = []
+  web_origins = []
 }
 `

@@ -21,6 +21,13 @@ func TestAccClientGrant(t *testing.T) {
 					resource.TestCheckResourceAttr("auth0_client_grant.my_client_grant", "scope.0", "create:foo"),
 				),
 			},
+			{
+				Config: testAccClientGrantWithoutScopeConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("auth0_client_grant.my_client_grant_without_scope", "audience", "https://api.example.com/client-grant-test-2"),
+					resource.TestCheckResourceAttr("auth0_client_grant.my_client_grant_without_scope", "scope.#", "0"),
+				),
+			},
 		},
 	})
 }
@@ -51,5 +58,25 @@ resource "auth0_client_grant" "my_client_grant" {
   client_id = "${auth0_client.my_client.id}"
   audience = "${auth0_resource_server.my_resource_server.identifier}"
   scope = [ "create:foo" ]
+}
+`
+const testAccClientGrantWithoutScopeConfig = `
+provider "auth0" {}
+
+resource "auth0_client" "my_client_2" {
+  name = "Application - Client Grant 2 - Acceptance Test"
+  custom_login_page_on = true
+  is_first_party = true
+}
+
+resource "auth0_resource_server" "my_resource_server_2" {
+  name = "Resource Server - Client Grant 2 - Acceptance Test"
+  identifier = "https://api.example.com/client-grant-test-2"
+}
+
+resource "auth0_client_grant" "my_client_grant_without_scope" {
+  client_id = "${auth0_client.my_client_2.id}"
+  audience = "${auth0_resource_server.my_resource_server_2.identifier}"
+  scope = []
 }
 `

@@ -15,12 +15,20 @@ func TestAccRule(t *testing.T) {
 			"auth0": Provider(),
 		},
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccRule,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("auth0_rule.my_rule", "name", "auth0-authorization-extension"),
 					resource.TestCheckResourceAttr("auth0_rule.my_rule", "script", "function (user, context, callback) { callback(null, user, context); }"),
 					resource.TestCheckResourceAttr("auth0_rule.my_rule", "enabled", "true"),
+				),
+			},
+			{
+				Config: testAccDisabledRule,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("auth0_rule.my_rule_2", "name", "auth0-authorization-extension-2"),
+					resource.TestCheckResourceAttr("auth0_rule.my_rule_2", "script", "function (user, context, callback) { callback(null, user, context); }"),
+					resource.TestCheckResourceAttr("auth0_rule.my_rule_2", "enabled", "false"),
 				),
 			},
 		},
@@ -34,6 +42,16 @@ resource "auth0_rule" "my_rule" {
   name = "auth0-authorization-extension"
   script = "function (user, context, callback) { callback(null, user, context); }"
   enabled = true
+}
+`
+
+const testAccDisabledRule = `
+provider "auth0" {}
+
+resource "auth0_rule" "my_rule_2" {
+  name = "auth0-authorization-extension-2"
+  script = "function (user, context, callback) { callback(null, user, context); }"
+  enabled = false
 }
 `
 
